@@ -133,7 +133,7 @@ if mode == "Candidate Mode":
 
         # Replace periods followed by space with a newline for better readability
             formatted_result = result.replace("  ", " ").replace("Missing technical skills:", "\nMissing technical skills:").replace("3 quick ATS improvement tips:", "\n3 quick ATS improvement tips:")
-            st.text(formatted_result)
+            st.markdown(formatted_result)
 
             # Extract and filter keywords
             raw_keywords = [w.strip() for w in result.split(",")]
