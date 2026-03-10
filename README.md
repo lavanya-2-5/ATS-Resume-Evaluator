@@ -14,10 +14,10 @@ Most companies use Applicant Tracking Systems (ATS) to filter resumes before a r
 
 This project solves that problem by providing:
 
-- ● AI-powered resume analysis  
-- ● ATS compatibility scoring  
-- ● Skill gap detection  
-- ● Recruiter-side candidate ranking  
+-  AI-powered resume analysis  
+-  ATS compatibility scoring  
+-  Skill gap detection  
+-  Recruiter-side candidate ranking  
 
 ---
 
@@ -50,6 +50,7 @@ Recruiters can upload multiple resumes and:
 The system uses **Retrieval-Augmented Generation** to provide context-aware responses with **Gemini 2.5 Flash via the Gemini API**.
 
 
+```text
 User Resume + Job Description
             │
             ▼
@@ -66,7 +67,7 @@ Gemini Flash 2.5 LLM
             │
             ▼
 ATS Analysis + Resume Feedback
-
+```
 
 ---
 
@@ -82,7 +83,7 @@ Resume analysis with ATS insights.
 ## Recruiter Dashboard
 Upload multiple resumes and rank candidates automatically.
 
-![Recruiter Dashboard](assets/recruiter_dashboard.png)
+![Recruiter Dashboard](assets/Recruiter_dashboard.png)
 
 ---
 
@@ -90,25 +91,26 @@ Upload multiple resumes and rank candidates automatically.
 
 ## Core Technologies
 
-- ● Python  
-- ● Streamlit  
-- ● Gemini API  
-- ● Gemini 2.5 Flash  
+- Python  
+- Streamlit  
+- Gemini API  
+- Gemini 2.5 Flash  
 
 <br>
 
 ## Libraries Used
 
-- ● pdfplumber  
-- ● python-docx  
-- ● python-dotenv  
-- ● Pillow  
-- ● PyPDF2  
+- pdfplumber  
+- python-docx  
+- python-dotenv  
+- Pillow  
+- PyPDF2  
 
 ---
 
 # 📂 Project Structure
 
+```text
 ATS-Resume-Evaluator
 │
 ├── app.py
@@ -119,27 +121,42 @@ ATS-Resume-Evaluator
 └── assets
     ├── candidate_dashboard.png
     └── recruiter_dashboard.png
-
+```
 
 ---
 
 # ⚙️ Installation
 
 ### Clone the repository
+
+```bash
 git clone https://github.com/lavanya-2-5/ATS-Resume-Evaluator.git
 cd ATS-Resume-Evaluator
+```
 
-Install dependencies:
+### Install dependencies
+
+```bash
 pip install -r requirements.txt
+```
 
-Add your API key in .env:
+### Add your API key in `.env`
+
+```env
 GEMINI_API_KEY=your_api_key_here
+```
 
-Run the application:
+### Run the application
+
+```bash
 streamlit run app.py
+```
 
-📊 Example ATS Output
+---
 
+# 📊 Example ATS Output
+
+```text
 ATS Compatibility Rating: Medium
 
 Missing Skills:
@@ -151,13 +168,17 @@ Suggestions:
 ● Add measurable achievements in projects
 ● Include relevant deployment tools
 ● Highlight backend architecture experience
+```
 
-🔮 Future Improvements
-● Resume rewriting using LLM
-● Semantic skill matching
-● Resume keyword heatmaps
-● Candidate analytics dashboard
-● Faster inference with response caching
+---
+
+# 🔮 Future Improvements
+
+- Resume rewriting using LLM  
+- Semantic skill matching  
+- Resume keyword heatmaps  
+- Candidate analytics dashboard  
+- Faster inference with response caching
 
 👩‍💻 Author
 Lavanya Ahlawat
