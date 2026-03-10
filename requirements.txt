@@ -6,4 +6,5 @@ python-docx
 pdfplumber
 PyPDF2
 pillow
-
+sentence-transformers
+faiss-cpu

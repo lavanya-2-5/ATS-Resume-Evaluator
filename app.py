@@ -6,9 +6,40 @@ import os
 import pdfplumber
 from google import genai
 from docx import Document
+import time
 
+from sentence_transformers import SentenceTransformer
+import faiss
+import numpy as np
 # ---------------- GEMINI SETUP ----------------
-client = genai.Client(api_key=os.getenv("GEMINI_API_KEY"))
+@st.cache_resource
+def load_gemini_client():
+    return genai.Client(api_key=os.getenv("GEMINI_API_KEY"))
+
+client = load_gemini_client()
+# ---------------- RAG SETUP ----------------
+embedding_model = SentenceTransformer("all-MiniLM-L6-v2")
+
+def load_knowledge_base():
+    with open("knowledge_base/skills.txt", "r") as f:
+        docs = f.readlines()
+    return [d.strip() for d in docs]
+
+kb_docs = load_knowledge_base()
+
+# create embeddings
+kb_embeddings = embedding_model.encode(kb_docs)
+
+# build FAISS index
+dimension = kb_embeddings.shape[1]
+index = faiss.IndexFlatL2(dimension)
+index.add(np.array(kb_embeddings))
+
+def retrieve_context(query, top_k=2):
+    query_embedding = embedding_model.encode([query])
+    distances, indices = index.search(np.array(query_embedding), top_k)
+    results = [kb_docs[i] for i in indices[0]]
+    return "\n".join(results)
 
 # ---------------- ATS TECH KEYWORDS ----------------
 TECH_KEYWORDS = {
@@ -31,24 +62,38 @@ def filter_relevant_keywords(raw_keywords):
     return list(dict.fromkeys(filtered))[:7]
 
 # ---------------- GEMINI RESPONSE ----------------
+@st.cache_data(ttl=600)
 def get_gemini_response(prompt, resume_text, job_description):
     try:
+
+        # RAG retrieval
+        context = retrieve_context(job_description)
+
         response = client.models.generate_content(
             model="gemini-2.5-flash",
             contents=f"""
 {prompt}
+
+Retrieved Industry Skill Context:
+{context}
 
 JOB DESCRIPTION:
 {job_description}
 
 RESUME:
 {resume_text}
-"""
+""" , 
+       config={
+           "temperature":0.2
+       }
         )
         return response.text
     except Exception as e:
-        return f"Error generating response: {e}"
-
+         if "429" in str(e):
+            time.sleep(60)
+            return "API rate limit reached. Please try again in a minute."
+         return f"Error generating response: {e}"
+    
 # ---------------- RESUME TEXT EXTRACTION ----------------
 def extract_text_from_resume(uploaded_file):
     try:
@@ -97,61 +142,111 @@ Keep output concise and short.
 """
 
 recruiter_prompt_rank = """
-Rank resumes by best match. Show only:
-- Resume filename or index
-- Match percentage or score
-- 1–2 key ATS skills missing (if any)
-Do NOT provide long paragraphs or explanations.
+You are an ATS recruiter assistant.
+
+Rank resumes by best match with the job description.
+
+IMPORTANT RULES:
+- Return ONLY the top N resumes requested.
+- Do NOT show more resumes than requested.
+- If N = 1, return ONLY the single best resume.
+
+Format:
+Resume <number>
+Match percentage: <score>
+Key ATS skills missing: <skills>
+
+No explanations. No extra text.
 """
 
 # ---------------- CANDIDATE DASHBOARD ----------------
 if mode == "Candidate Mode":
     st.subheader("Candidate Dashboard")
-    job_desc = st.text_area("Enter Job Description")
-    resume_file = st.file_uploader("Upload Your Resume (PDF / DOCX / TXT)", type=["pdf", "docx", "txt"])
-    
+
+    job_desc = st.text_area("Enter Job Description", key="candidate_jd")
+    resume_file = st.file_uploader(
+        "Upload Your Resume (PDF / DOCX / TXT)",
+        type=["pdf", "docx", "txt"]
+    )
+
     col1, col2 = st.columns(2)
+
     with col1:
         btn_improve = st.button("Resume Improvement Suggestions")
+
     with col2:
         btn_ats = st.button("ATS Readiness Check")
-    
+
+    # Session state storage
+    if "resume_text" not in st.session_state:
+        st.session_state.resume_text = ""
+
+    if resume_file:
+        st.session_state.resume_text = extract_text_from_resume(resume_file)
+
+    resume_text = st.session_state.resume_text
+
     if resume_file and job_desc:
-        resume_text = extract_text_from_resume(resume_file)
-        
+
         # Resume Improvement
         if btn_improve:
-            result = get_gemini_response(candidate_prompt_improve, resume_text, job_desc)
+            with st.spinner("Analyzing resume..."):
+                result = get_gemini_response(
+                    candidate_prompt_improve,
+                    resume_text,
+                    job_desc
+                )
+
             st.subheader("Resume Improvement Feedback")
             st.write(result)
-            st.download_button("Download Improvements", data=result, file_name="resume_improvements.txt")
-        
+
+            st.download_button(
+                "Download Improvements",
+                data=result,
+                file_name="resume_improvements.txt"
+            )
+
         # ATS Readiness
         if btn_ats:
-            result = get_gemini_response(candidate_prompt_ats, resume_text, job_desc)
+            with st.spinner("Analyzing ATS readiness..."):
+                result = get_gemini_response(
+                    candidate_prompt_ats,
+                    resume_text,
+                    job_desc
+                )
+
             st.subheader("ATS Readiness Feedback")
 
-        # Replace periods followed by space with a newline for better readability
-            formatted_result = result.replace("  ", " ").replace("Missing technical skills:", "\nMissing technical skills:").replace("3 quick ATS improvement tips:", "\n3 quick ATS improvement tips:")
+            formatted_result = result.replace("  ", " ").replace(
+                "Missing technical skills:", "\nMissing technical skills:"
+            ).replace(
+                "3 quick ATS improvement tips:", "\n3 quick ATS improvement tips:"
+            )
+
             st.markdown(formatted_result)
 
-            # Extract and filter keywords
             raw_keywords = [w.strip() for w in result.split(",")]
             relevant_keywords = filter_relevant_keywords(raw_keywords)
+
             if relevant_keywords:
                 st.markdown("**Missing ATS Skill Signals:**")
                 st.write(relevant_keywords)
             else:
                 st.success("No critical ATS skill gaps detected")
-            st.download_button("Download ATS Feedback", data=result, file_name="ats_feedback.txt")
-    
+
+            st.download_button(
+                "Download ATS Feedback",
+                data=result,
+                file_name="ats_feedback.txt"
+            )
+
     elif (btn_improve or btn_ats) and not resume_file:
         st.warning("Please upload your resume and enter the job description.")
 
 # ---------------- RECRUITER DASHBOARD ----------------
 else:
     st.subheader("Recruiter Dashboard")
-    job_desc = st.text_area("Enter Job Description")
+    job_desc = st.text_area("Enter Job Description", key="recruiter_jd")
     resume_files = st.file_uploader(
         "Upload Multiple Resumes (PDF / DOCX / TXT)", 
         type=["pdf", "docx", "txt"], 
@@ -166,8 +261,9 @@ else:
         combined_prompt = recruiter_prompt_rank + f"\nJob Description:\n{job_desc}\nResumes:\n"
         for i, text in enumerate(resumes_texts):
             combined_prompt += f"\nResume {i+1}:\n{text}\n"
-        combined_prompt += f"\nList top {top_n} resumes."
-        ranking = get_gemini_response(combined_prompt, "", "")
+        combined_prompt += f"\nReturn ONLY the TOP {top_n} resumes. Do not list others."
+        with st.spinner("Ranking resumes..."):
+               ranking = get_gemini_response(combined_prompt, "", "")
         st.subheader(f"Top {top_n} Resumes Ranking")
         st.write(ranking)
     

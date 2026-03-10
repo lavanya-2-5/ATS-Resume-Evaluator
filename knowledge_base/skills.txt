@@ -1,0 +1,5 @@
+Backend Developer: Java, Spring Boot, REST APIs, Microservices, Docker, Kubernetes, Kafka
+Data Scientist: Python, Pandas, NumPy, Machine Learning, Deep Learning, TensorFlow, PyTorch
+ML Engineer: Python, TensorFlow, PyTorch, MLOps, Kubernetes, Docker
+Frontend Developer: JavaScript, React, HTML, CSS, TypeScript
+Cloud Engineer: AWS, GCP, Azure, Docker, Kubernetes, Terraform
