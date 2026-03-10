@@ -1,40 +1,54 @@
-🚀 AI-Powered ATS Resume Evaluator
-An intelligent ATS Resume Analyzer that helps candidates optimize resumes and enables recruiters to rank multiple candidates automatically using LLMs and Retrieval-Augmented Generation (RAG).
+# 🚀 AI-Powered ATS Resume Evaluator
+
+An intelligent ATS Resume Analyzer that helps candidates optimize resumes and enables recruiters to rank multiple candidates automatically using LLMs and Retrieval-Augmented Generation (RAG).  
+
 Built using Python, Streamlit, and Google Gemini API, this system analyzes resumes against job descriptions to identify skill gaps, ATS compatibility, and candidate ranking.
 
-📌 Problem Statement
+---
+
+# 📌 Problem Statement
+
 Most companies use Applicant Tracking Systems (ATS) to filter resumes before a recruiter even sees them.
 
-📉 75% of resumes are rejected automatically because they are not optimized for ATS.
+📉 **75% of resumes are rejected automatically because they are not optimized for ATS.**
 
 This project solves that problem by providing:
 
-● AI-powered resume analysis
-● ATS compatibility scoring
-● Skill gap detection
-● Recruiter-side candidate ranking
+- ● AI-powered resume analysis  
+- ● ATS compatibility scoring  
+- ● Skill gap detection  
+- ● Recruiter-side candidate ranking  
 
-✨ Key Features
+---
 
-👤 Candidate Mode
+# ✨ Key Features
+
+## 👤 Candidate Mode
+
 Upload your resume and job description to receive:
 
-📊 ATS Compatibility Score
-🧠 AI Resume Improvement Suggestions
-❌ Missing Technical Skills
-📈 Keyword Coverage Analysis
-💾 Downloadable ATS Feedback
+- 📊 ATS Compatibility Score  
+- 🧠 AI Resume Improvement Suggestions  
+- ❌ Missing Technical Skills  
+- 📈 Keyword Coverage Analysis  
+- 💾 Downloadable ATS Feedback  
 
-🧑‍💼 Recruiter Mode
+<br>
+
+## 🧑‍💼 Recruiter Mode
+
 Recruiters can upload multiple resumes and:
 
-📂 Analyze multiple candidates simultaneously
-🏆 Rank top candidates automatically
-📊 Show Top-N resume matches
-🔍 Identify skill gaps instantly
+- 📂 Analyze multiple candidates simultaneously  
+- 🏆 Rank top candidates automatically  
+- 📊 Show Top-N resume matches  
+- 🔍 Identify skill gaps instantly  
 
-🧠 AI Architecture
-The system uses Retrieval-Augmented Generation to provide context-aware responses with Gemini 2.5 Flash via the Gemini API.
+---
+
+# 🧠 AI Architecture
+The system uses **Retrieval-Augmented Generation** to provide context-aware responses with **Gemini 2.5 Flash via the Gemini API**.
+
 
 User Resume + Job Description
             │
@@ -53,40 +67,48 @@ Gemini Flash 2.5 LLM
             ▼
 ATS Analysis + Resume Feedback
 
-🖥 Application UI
 
-Candidate Dashboard
+---
+
+# 🖥 Application UI
+
+## Candidate Dashboard
 Resume analysis with ATS insights.
 
+![Candidate Dashboard](assets/candidate_dashboard.png)
 
+<br>
 
-
-
-
-
-Recruiter Dashboard
+## Recruiter Dashboard
 Upload multiple resumes and rank candidates automatically.
 
+![Recruiter Dashboard](assets/recruiter_dashboard.png)
 
+---
 
+# 🛠 Tech Stack
 
+## Core Technologies
 
+- ● Python  
+- ● Streamlit  
+- ● Gemini API  
+- ● Gemini 2.5 Flash  
 
-🛠 Tech Stack
-Core Technologies:
-● Python
-● Streamlit
-● Gemini API
-● Gemini 2.5 Flash
+<br>
 
-Libraries Used:
-● pdfplumber
-● python-docx
-● python-dotenv
-● Pillow
-● PyPDF2
+## Libraries Used
 
-📂 Project Structure
+- ● pdfplumber  
+- ● python-docx  
+- ● python-dotenv  
+- ● Pillow  
+- ● PyPDF2  
+
+---
+
+# 📂 Project Structure
+
 ATS-Resume-Evaluator
 │
 ├── app.py
@@ -98,10 +120,14 @@ ATS-Resume-Evaluator
     ├── candidate_dashboard.png
     └── recruiter_dashboard.png
 
-⚙️ Installation
-Clone the repository:
-git clone https://github.com/yourusername/ats-resume-evaluator.git
-cd ats-resume-evaluator
+
+---
+
+# ⚙️ Installation
+
+### Clone the repository
+git clone https://github.com/lavanya-2-5/ATS-Resume-Evaluator.git
+cd ATS-Resume-Evaluator
 
 Install dependencies:
 pip install -r requirements.txt
@@ -113,6 +139,7 @@ Run the application:
 streamlit run app.py
 
 📊 Example ATS Output
+
 ATS Compatibility Rating: Medium
 
 Missing Skills:
